@@ -4,6 +4,11 @@ import streamlit as st
 import streamlit.components.v1 as components
 from groq import Groq
 
+@st.cache_resource
+def get_client() -> Groq:
+    """Return a singleton Groq client for all calls."""
+    return Groq(api_key=os.getenv("GROQ_API_KEY"))
+
 # ---------- PAGE CONFIG ----------
 st.set_page_config(
     page_title="Humans design bad forms. Let AI help",
