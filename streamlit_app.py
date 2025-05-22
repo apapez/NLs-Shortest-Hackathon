@@ -105,13 +105,43 @@ if uploader:
 
     data = json.loads(rsp.choices[0].message.content)
 
-    # 3 ▸ summary at top
-    hi = max(data["heuristics"], key=lambda h: h["score"])
-    lo = min(data["heuristics"], key=lambda h: h["score"])
+        # ---------- DYNAMIC 5-BULLET SUMMARY ----------
+    
+    def dynamic_summary(data_json: dict) -> str:
+        """
+        Call a smaller, cheap Groq Llama-3 model to turn the numeric audit
+        into 4-5 varied, emoji-led bullets.  Returns raw markdown.
+        """
+        prompt = f"""
+    You are a senior UX copywriter.
+    Write 4-5 short, actionable bullets about this form audit JSON.
+    • Mix praise and constructive advice. 
+    • Vary word choice every time; avoid templates.
+    • Each bullet ≤ 18 words, start with a fitting emoji.
+    JSON:
+    {json.dumps(data_json, indent=2)}
+    """
+        c = get_client()                     # cached Groq client we set earlier
+        rsp = c.chat.completions.create(
+            model="llama3-8b-8192",          # fast & inexpensive
+            messages=[{"role":"user","content":prompt}],
+            temperature=0.9,                 # more creativity
+            max_tokens=180,
+        )
+        return rsp.choices[0].message.content.strip()
+    
+    # produce the bullets
+    bullets_md = dynamic_summary(data)
+    
+    # pretty card
     summary_slot.markdown(
-        f"**{data['praise_line']}**  \n"
-        f"Highest: **{hi['name']}** ({hi['score']}/5) &nbsp;|&nbsp; "
-        f"Biggest opportunity: **{lo['name']}** ({lo['score']}/5)"
+        f"""
+        <div style="background:#23395d22;padding:18px 22px;
+                    border-left:6px solid #2f9cf4;border-radius:6px;margin-bottom:14px;">
+            {bullets_md}
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
 
     # 4 ▸ animated bars
