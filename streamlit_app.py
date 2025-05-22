@@ -11,7 +11,29 @@ img = st.file_uploader("Drop a screenshot of your form →", type=["png", "jpg",
 # if img:
 #    st.image(img, caption="Your form")
 #    st.success("Great! AI analysis will appear here once we add the API call.")
+# ---------- TOP-LEVEL PLACEHOLDERS ----------
+col1, col2 = st.columns([1, 1])          # 50-50 split; tweak to taste
 
+with col1:
+    st.subheader("Drop a screenshot of your form →")
+    uploader = st.file_uploader("", type=["png", "jpg", "jpeg"])
+
+# Reserve empty containers so we can update later
+img_slot       = col1.empty()
+score_header   = col2.empty()
+score_slots    = [col2.empty() for _ in range(5)]
+fix_header     = col2.empty()
+fix_slot       = col2.empty()
+praise_slot    = col2.empty()
+
+# ---------- DUMMY RIGHT PANE BEFORE UPLOAD ----------
+if uploader is None:
+    score_header.subheader("📊 Heuristic scores")
+    for s in score_slots:
+        s.progress(0)
+    fix_header.subheader("🛠️ Top fixes")
+    fix_slot.write("• _none yet_")
+    praise_slot.info("Upload a screenshot to get instant feedback.")
 
 # ------------------------------------------
 # 🖼️  Vision path with Llama-4 Scout
