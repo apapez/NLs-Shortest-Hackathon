@@ -14,7 +14,7 @@ img = st.file_uploader("Drop a screenshot of your form →", type=["png", "jpg",
 # ------------------------------------------
 # 🖼️  Vision path with Llama-4 Scout
 # ------------------------------------------
-elif img:
+if img:
     # read the uploaded file into bytes
     image_bytes = img.getvalue()
 
