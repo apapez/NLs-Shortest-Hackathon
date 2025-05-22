@@ -56,7 +56,7 @@ with right:
 # ---------- BEFORE UPLOAD ----------
 if uploader is None:
     summary_slot.info("Waiting for you to upload an image…")
-    score_header.subheader("⭐ Scores of your form")
+    score_header.subheader("🌡️ Form health check")
     for bar in score_slots:
         bar.progress(0)
     fix_header.subheader("🚧 What you should go fix")
@@ -76,11 +76,17 @@ if uploader:
             "text": (
                 "You are a senior UX researcher.\n"
                 "Evaluate the web form shown in this screenshot.\n"
-                'Return STRICT JSON with:{"heuristics":[{"name":"Purpose Fit","score":0,"comment":""},'
-                '{"name":"Efficiency","score":0,"comment":""},{"name":"Clarity","score":0,"comment":""},'
-                '{"name":"Efficiency","score":0,"comment":""},{"name":"Accessibility","score":0,"comment":""}],'
-                '"top_fixes":["","",""],"praise_line":""}\n'
-                "Score 0-5, comments <=50 words."
+                "Return STRICT JSON with:\n"
+                '{ "heuristics":[\n'
+                '  {"name":"Goal Clarity","score":0,"comment":""},\n'
+                '  {"name":"Cognitive Load","score":0,"comment":""},\n'
+                '  {"name":"Data Minimalism","score":0,"comment":""},\n'
+                '  {"name":"Accessibility","score":0,"comment":""},\n'
+                '  {"name":"Trust Cues","score":0,"comment":""}\n'
+                '],\n'
+                '  "top_fixes":["","",""],\n'
+                '  "praise_line":"" }\n'
+                "Score 0-5, comments ≤ 50 words."
             ),
         },
         {"type": "image_url", "image_url": {"url": data_url}},
@@ -109,7 +115,7 @@ if uploader:
     )
 
     # 4 ▸ animated bars
-    score_header.subheader("📊 Heuristic scores")
+    score_header.subheader("🌡️ Form health check")
     for i, h in enumerate(data["heuristics"]):
         for v in range(h["score"] + 1):
             score_slots[i].progress(
@@ -119,7 +125,7 @@ if uploader:
             time.sleep(0.04)
 
     # 5 ▸ fixes
-    fix_header.subheader("🛠️ Top fixes")
+    fix_header.subheader("🚧 What you should go fix")
     fix_slot.write(" • ".join(data["top_fixes"]))
 
     # 6 ▸ JSON copy button & details
