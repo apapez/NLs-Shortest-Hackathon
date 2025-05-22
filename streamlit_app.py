@@ -131,20 +131,23 @@ if uploader:
     # RE-ENTER the right column so content stays there
       # Copy-to-clipboard button (fills full column width)
     with right:
+        # … Top fixes already rendered …
+    
+        # Copy-to-clipboard button (fills full column width)
         st.markdown(
-        f"""
-        <button
-            style="display:block;width:100%;
-                   margin-top:16px;background:#2f9cf4;color:white;
-                   border:none;padding:12px 0;border-radius:6px;
-                   font-size:15px;cursor:pointer;"
-            onclick='navigator.clipboard.writeText({json.dumps(json_str)})'>
-            📋 Copy full&nbsp;JSON
-        </button>
-        """,
-        unsafe_allow_html=True,
-    )
-
+            f"""
+            <button
+                style="display:block;width:100%;
+                       margin-top:16px;background:#2f9cf4;color:white;
+                       border:none;padding:12px 0;border-radius:6px;
+                       font-size:15px;cursor:pointer;"
+                onclick='navigator.clipboard.writeText({json.dumps(json_str)})'>
+                📋 Copy full&nbsp;JSON
+            </button>
+            """,
+            unsafe_allow_html=True,
+        )
+    
         # Collapsible viewer + download
         with st.expander("See JSON details"):
             st.code(json_str, language="json")
