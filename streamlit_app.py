@@ -1,48 +1,50 @@
 # ---------- IMPORTS ----------
-import streamlit as st, os, base64, json, time
+import os, base64, json, time
+import streamlit as st
+import streamlit.components.v1 as components
 from groq import Groq
 
-# ---------- PAGE CONFIG (must be 1st!) ----------
-st.set_page_config(page_title="Humans design bad forms. Let AI help",
-                   page_icon="📝", layout="wide")
-st.markdown("""
-<style>
-/* first column (left)  */
-div[data-testid="column"]:nth-of-type(1)  > div:first-child {
-    background:#f4f4f4 !important;   /* light grey */
-    padding:20px; border-radius:8px;
-}
-/* second column (right) */
-div[data-testid="column"]:nth-of-type(2)  > div:first-child {
-    background:#ffffff !important;   /* white */
-    padding:20px; border-radius:8px;
-}
-/* colour for progress bars */
-.stProgress > div > div > div > div {
-    background-color:#2f9cf4 !important;
-}
-</style>
-""", unsafe_allow_html=True)
+# ---------- PAGE CONFIG ----------
+st.set_page_config(
+    page_title="Humans design bad forms. Let AI help",
+    page_icon="📝",
+    layout="wide",
+)
+
+# ---------- LIGHT & DARK STYLES ----------
+st.markdown(
+    """
+    <style>
+      /* column backgrounds */
+      div[data-testid="column"]:nth-of-type(1)  > div:first-child {background:#f4f4f4;padding:24px;border-radius:8px;}
+      div[data-testid="column"]:nth-of-type(2)  > div:first-child {background:#ffffff;padding:24px;border-radius:8px;}
+
+      /* blue progress bars */
+      .stProgress > div > div > div > div {background:#2f9cf4 !important;}
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
 # ---------- HEADER ----------
 st.markdown(
     """
-    <div style='width:100%; background:#111; padding:6px 12px;'>
-        <span style='font-size:15px; color:#bbb;'>
-            📝 Humans design bad forms. Let AI help (alpha)
-        </span>
+    <div style='width:100%;background:#111;padding:6px 12px'>
+      <span style='font-size:15px;color:#bbb'>
+        📝 Humans design bad forms. Let AI help (alpha)
+      </span>
     </div>
     """,
     unsafe_allow_html=True,
 )
 
-# ---------- LAYOUT: 2/3 – 1/3 ----------
-left, right = st.columns([2, 1], gap="small")   # 2-third / 1-third
+# ---------- LAYOUT ----------
+left, right = st.columns([2, 1], gap="small")
 
 with left:
     st.subheader("Drop a screenshot of your form →")
-    uploader = st.file_uploader("", type=["png", "jpg", "jpeg"])
-    img_slot = st.empty()
+    uploader  = st.file_uploader("", type=["png", "jpg", "jpeg"])
+    img_slot  = st.empty()
 
 with right:
     summary_slot = st.empty()
@@ -50,105 +52,90 @@ with right:
     score_slots  = [st.empty() for _ in range(5)]
     fix_header   = st.empty()
     fix_slot     = st.empty()
-    praise_slot  = st.empty()
-  
 
 # ---------- BEFORE UPLOAD ----------
 if uploader is None:
     summary_slot.info("Awaiting an image…")
     score_header.subheader("📊 Scores of your form")
-    for s in score_slots:
-        s.progress(0)
+    for bar in score_slots:
+        bar.progress(0)
     fix_header.subheader("🛠️ What you should go fix")
     fix_slot.write("—")
 
 # ---------- AFTER UPLOAD ----------
 if uploader:
+    # 1 ▸ preview image
     img_slot.image(uploader, caption="Your form")
 
-    # encode image
+    # 2 ▸ encode + prompt
     b64 = base64.b64encode(uploader.getvalue()).decode()
     data_url = f"data:image/jpeg;base64,{b64}"
-
-    # prompt
     user_content = [
-        {"type":"text","text":(
-            "You are a senior UX researcher.\n"
-            "Evaluate the web form shown in this screenshot.\n"
-            "Return STRICT JSON with:\n"
-            '{"heuristics":[{"name":"Clarity","score":0,"comment":""},'
-            '{"name":"Grouping","score":0,"comment":""},'
-            '{"name":"ErrorHandling","score":0,"comment":""},'
-            '{"name":"Efficiency","score":0,"comment":""},'
-            '{"name":"Accessibility","score":0,"comment":""}],'
-            '"top_fixes":["","",""],"praise_line":""}\n'
-            "Score 0-5, comments <=20 words."
-        )},
-        {"type":"image_url","image_url":{"url":data_url}}
+        {
+            "type": "text",
+            "text": (
+                "You are a senior UX researcher.\n"
+                "Evaluate the web form shown in this screenshot.\n"
+                'Return STRICT JSON with: {"heuristics":[{"name":"Clarity","score":0,"comment":""},'
+                '{"name":"Grouping","score":0,"comment":""},{"name":"ErrorHandling","score":0,"comment":""},'
+                '{"name":"Efficiency","score":0,"comment":""},{"name":"Accessibility","score":0,"comment":""}],'
+                '"top_fixes":["","",""],"praise_line":""}\n'
+                "Score 0-5, comments <=20 words."
+            ),
+        },
+        {"type": "image_url", "image_url": {"url": data_url}},
     ]
 
-    client = Groq(api_key=os.environ["GROQ_API_KEY"])
+    client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
     with st.spinner("Asking Llama-4 Vision…"):
         rsp = client.chat.completions.create(
             model="meta-llama/llama-4-scout-17b-16e-instruct",
-            messages=[{"role":"user","content":user_content}],
+            messages=[{"role": "user", "content": user_content}],
             temperature=0.3,
             max_completion_tokens=512,
-            response_format={"type":"json_object"}      # remove if it 500-errors
+            response_format={"type": "json_object"},
         )
 
     data = json.loads(rsp.choices[0].message.content)
 
-    # summary / praise at top
-    high = max(data["heuristics"], key=lambda h: h["score"])
-    low  = min(data["heuristics"], key=lambda h: h["score"])
+    # 3 ▸ summary at top
+    hi = max(data["heuristics"], key=lambda h: h["score"])
+    lo = min(data["heuristics"], key=lambda h: h["score"])
     summary_slot.markdown(
         f"**{data['praise_line']}**  \n"
-        f"Highest area: **{high['name']}** ({high['score']}/5). "
-        f"Biggest opportunity: **{low['name']}** ({low['score']}/5)."
+        f"Highest: **{hi['name']}** ({hi['score']}/5) &nbsp;|&nbsp; "
+        f"Biggest opportunity: **{lo['name']}** ({lo['score']}/5)"
     )
 
-    # animate scores
+    # 4 ▸ animated bars
     score_header.subheader("📊 Heuristic scores")
     for i, h in enumerate(data["heuristics"]):
-        for val in range(h["score"] + 1):
-            score_slots[i].progress(val/5,
-                text=f"{h['name']} {val}/5 — {h['comment'] if val==h['score'] else ''}")
-            time.sleep(0.05)
+        for v in range(h["score"] + 1):
+            score_slots[i].progress(
+                v / 5,
+                text=f"{h['name']} {v}/5 — {h['comment'] if v == h['score'] else ''}",
+            )
+            time.sleep(0.04)
 
-    # fixes
+    # 5 ▸ fixes
     fix_header.subheader("🛠️ Top fixes")
-    fix_slot.write("\n".join("• "+f for f in data["top_fixes"]))
+    fix_slot.write(" • ".join(data["top_fixes"]))
 
-    # ---------- JSON copy button + details (place JUST below fix_slot.write(...)) ----------
-    import json as _json
-    import streamlit.components.v1 as components   # make sure this import is present
-    
-    json_str = _json.dumps(data, indent=2)
-    
-    # 1) Copy-to-clipboard button
+    # 6 ▸ JSON copy button & details
+    json_str = json.dumps(data, indent=2)
     components.html(
         f"""
-        <div style="display:flex; justify-content:flex-start">
-          <button
-            style="
-              background:#2f9cf4;
-              color:white;
-              border:none;
-              padding:10px 20px;
-              border-radius:6px;
-              font-size:14px;
-              cursor:pointer;"
-            onclick='navigator.clipboard.writeText({ _json.dumps(json_str) })'>
-            📋 Copy full&nbsp;JSON
-          </button>
-        </div>
+        <button
+            style="margin-top:16px;background:#2f9cf4;color:white;border:none;padding:10px 20px;
+                   border-radius:6px;font-size:14px;cursor:pointer;"
+            onclick='navigator.clipboard.writeText({json.dumps(json_str)})'>
+            📋 Copy full JSON
+        </button>
         """,
-        height=60,   #  <= must be > the button’s height
+        height=50,
     )
-    
-    # 2) Collapsed expander to view / download
+
     with st.expander("See details"):
         st.code(json_str, language="json")
         st.download_button(
