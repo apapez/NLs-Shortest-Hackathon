@@ -2,7 +2,6 @@
 import streamlit as st, os, base64, json, time           #  add 'time' for animations
 from groq import Groq
 
-
 # ---------- PAGE CONFIG ----------
 st.set_page_config(page_title="Humans design bad forms. Let AI help", page_icon="📝", layout="wide")
 
