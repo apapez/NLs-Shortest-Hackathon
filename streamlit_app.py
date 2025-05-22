@@ -5,22 +5,24 @@ from groq import Groq
 # ---------- PAGE CONFIG (must be 1st!) ----------
 st.set_page_config(page_title="Humans design bad forms. Let AI help",
                    page_icon="📝", layout="wide")
-
-st.markdown(
-    """
-    <style>
-      /* two reusable panel styles */
-      .panel-left  { background:#f4f4f4 !important; padding:16px; border-radius:6px; }
-      .panel-right { background:#ffffff !important; padding:16px; border-radius:6px; }
-
-      /* progress-bar colour */
-      .stProgress > div > div > div > div {
-          background-color:#2f9cf4 !important;
-      }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
+st.markdown("""
+<style>
+/* first column (left)  */
+div[data-testid="column"]:nth-of-type(1)  > div:first-child {
+    background:#f4f4f4 !important;   /* light grey */
+    padding:20px; border-radius:8px;
+}
+/* second column (right) */
+div[data-testid="column"]:nth-of-type(2)  > div:first-child {
+    background:#ffffff !important;   /* white */
+    padding:20px; border-radius:8px;
+}
+/* colour for progress bars */
+.stProgress > div > div > div > div {
+    background-color:#2f9cf4 !important;
+}
+</style>
+""", unsafe_allow_html=True)
 
 # ---------- HEADER ----------
 st.markdown(
@@ -38,21 +40,17 @@ st.markdown(
 left, right = st.columns([2, 1], gap="small")   # 2-third / 1-third
 
 with left:
-    st.markdown("<div class='panel-left'>", unsafe_allow_html=True)
     st.subheader("Drop a screenshot of your form →")
     uploader = st.file_uploader("", type=["png", "jpg", "jpeg"])
     img_slot = st.empty()
-    st.markdown("</div>", unsafe_allow_html=True)   # ← close
 
 with right:
-    st.markdown("<div class='panel-right'>", unsafe_allow_html=True)
     summary_slot = st.empty()
     score_header = st.empty()
     score_slots  = [st.empty() for _ in range(5)]
     fix_header   = st.empty()
     fix_slot     = st.empty()
     praise_slot  = st.empty()
-    st.markdown("</div>", unsafe_allow_html=True)   # ← close
   
 
 # ---------- BEFORE UPLOAD ----------
