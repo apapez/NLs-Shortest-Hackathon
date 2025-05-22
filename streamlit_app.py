@@ -2,8 +2,16 @@
 import streamlit as st, os, base64, json, time           #  add 'time' for animations
 from groq import Groq
 
+rsp = client.chat.completions.create(
+    model="meta-llama/llama-4-scout-17b-16e-instruct",
+    messages=[{"role": "user", "content": user_content}],
+    temperature=0.3,
+    max_completion_tokens=512,          # ← NEW
+    # response_format={"type": "json_object"},   # ← comment out if 500 persists
+)
+
 # ---------- PAGE CONFIG ----------
-st.set_page_config(page_title="Find out how good your form is", page_icon="📝", layout="wide")
+st.set_page_config(page_title="Humans design bad forms. Let AI help", page_icon="📝", layout="wide")
 
 # ---------- TOP-LEVEL PLACEHOLDERS ----------
 col1, col2 = st.columns([1, 1])          # 50-50 split; tweak to taste
@@ -22,12 +30,12 @@ praise_slot    = col2.empty()
 
 # ---------- DUMMY RIGHT PANE BEFORE UPLOAD ----------
 if uploader is None:
-    score_header.subheader("📊 Heuristic scores")
+    score_header.subheader("📊 Scores of your form")
     for s in score_slots:
         s.progress(0)
     fix_header.subheader("🛠️ Top fixes")
     fix_slot.write("• _none yet_")
-    praise_slot.info("Upload a screenshot to get instant feedback.")
+    praise_slot.info("Upload a screenshot to see if your form deserved praise.")
 
 # ---------- MAIN FLOW AFTER UPLOAD ----------
 if uploader:
@@ -58,7 +66,7 @@ if uploader:
               '  "top_fixes":["","",""],\n'
               '  "praise_line":""\n'
               "}\n"
-              "Score 0-5, comments ≤20 words, no keys beyond the schema."
+              "Score 0-5, comments <=20 words, no keys beyond the schema."
           )},
         { "type": "image_url", "image_url": { "url": data_url } }
     ]
