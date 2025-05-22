@@ -145,7 +145,7 @@ if uploader:
             </button>
             """,
             height=60,   # ≥ button height
-            width=100%   # full width lets go
+            width=100%,  # full width lets go
         )
 
         # Collapsible viewer + download
