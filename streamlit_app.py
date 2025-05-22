@@ -60,7 +60,7 @@ if uploader is None:
     for bar in score_slots:
         bar.progress(0)
     fix_header.subheader("🚧 What you should go fix")
-    fix_slot.write("—")
+    fix_slot.write("")
 
 # ---------- AFTER UPLOAD ----------
 if uploader:
