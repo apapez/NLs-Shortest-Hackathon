@@ -121,29 +121,34 @@ if uploader:
     fix_header.subheader("🛠️ Top fixes")
     fix_slot.write("\n".join("• "+f for f in data["top_fixes"]))
 
-    # ---------- JSON copy button & details ----------
+    # ---------- JSON copy button + details (place JUST below fix_slot.write(...)) ----------
     import json as _json
+    import streamlit.components.v1 as components   # make sure this import is present
+    
     json_str = _json.dumps(data, indent=2)
-
-    # Copy button – always visible
+    
+    # 1) Copy-to-clipboard button
     components.html(
         f"""
-        <button style="
-            background:#2f9cf4;
-            color:white;
-            border:none;
-            padding:10px 18px;
-            border-radius:6px;
-            font-size:14px;
-            cursor:pointer;"
-            onclick='navigator.clipboard.writeText({ _json.dumps(json_str) });'>
-            📋 Copy full JSON
-        </button>
+        <div style="display:flex; justify-content:flex-start">
+          <button
+            style="
+              background:#2f9cf4;
+              color:white;
+              border:none;
+              padding:10px 20px;
+              border-radius:6px;
+              font-size:14px;
+              cursor:pointer;"
+            onclick='navigator.clipboard.writeText({ _json.dumps(json_str) })'>
+            📋 Copy full&nbsp;JSON
+          </button>
+        </div>
         """,
-        height=50,
+        height=60,   #  <= must be > the button’s height
     )
-
-    # Collapsible details
+    
+    # 2) Collapsed expander to view / download
     with st.expander("See details"):
         st.code(json_str, language="json")
         st.download_button(
