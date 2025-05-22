@@ -144,8 +144,8 @@ if uploader:
                 📋 Copy full&nbsp;JSON
             </button>
             """,
-            height=60,   # ≥ button height
-            width=100%,  # full width lets go
+            height=60,      # keep a bit taller than the button itself
+            width="100%",   # full width lets go
         )
 
         # Collapsible viewer + download
