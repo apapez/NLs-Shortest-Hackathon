@@ -62,8 +62,8 @@ if uploader:
           )},
         { "type": "image_url", "image_url": { "url": data_url } }
     ]
+
     
-    ]
     client = Groq(api_key=os.environ["GROQ_API_KEY"])
     with st.spinner("Asking Llama-4 Vision…"):
         rsp = client.chat.completions.create(
