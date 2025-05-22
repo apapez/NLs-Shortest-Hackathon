@@ -134,18 +134,21 @@ if uploader:
         components.html(
             f"""
             <button
-                style="margin-top:20px;background:#2f9cf4;color:white;
-                       border:none;
-                       padding:10px 20px;
-                       border-radius:6px;
-                       font-size:14px;
-                       cursor:pointer;"
-                onclick='navigator.clipboard.writeText({ _json.dumps(json_str) })'>
+                style="
+                  display:block;           /* let it take the full iframe width            */
+                  width:100%;              /* stretch across the whole column              */
+                  background:#2f9cf4;
+                  color:white;
+                  border:none;
+                  padding:12px 0;          /* vertical padding only; horizontal via width  */
+                  border-radius:6px;
+                  font-size:15px;
+                  cursor:pointer;">
                 📋 Copy full&nbsp;JSON
             </button>
             """,
-            height=60,   # ≥ button height
-            width=100%   # full width lets go
+            height=60,      # keep a bit taller than the button itself
+            width="100%",   # <-- NEW: iframe now matches column width
         )
 
         # Collapsible viewer + download
