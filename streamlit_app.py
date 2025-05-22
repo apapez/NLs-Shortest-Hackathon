@@ -42,7 +42,7 @@ st.markdown(
 left, right = st.columns([2, 1], gap="small")
 
 with left:
-    st.subheader("Drop a screenshot of your form →")
+    st.subheader("Let AI grade your form ↓")
     uploader  = st.file_uploader("", type=["png", "jpg", "jpeg"])
     img_slot  = st.empty()
 
@@ -55,11 +55,11 @@ with right:
 
 # ---------- BEFORE UPLOAD ----------
 if uploader is None:
-    summary_slot.info("Awaiting an image…")
-    score_header.subheader("📊 Scores of your form")
+    summary_slot.info("Waiting for you to upload an image…")
+    score_header.subheader("⭐ Scores of your form")
     for bar in score_slots:
         bar.progress(0)
-    fix_header.subheader("🛠️ What you should go fix")
+    fix_header.subheader("🚧 What you should go fix")
     fix_slot.write("—")
 
 # ---------- AFTER UPLOAD ----------
@@ -76,11 +76,11 @@ if uploader:
             "text": (
                 "You are a senior UX researcher.\n"
                 "Evaluate the web form shown in this screenshot.\n"
-                'Return STRICT JSON with: {"heuristics":[{"name":"Clarity","score":0,"comment":""},'
-                '{"name":"Grouping","score":0,"comment":""},{"name":"ErrorHandling","score":0,"comment":""},'
+                'Return STRICT JSON with:{"heuristics":[{"name":"Purpose Fit","score":0,"comment":""},'
+                '{"name":"Efficiency","score":0,"comment":""},{"name":"Clarity","score":0,"comment":""},'
                 '{"name":"Efficiency","score":0,"comment":""},{"name":"Accessibility","score":0,"comment":""}],'
                 '"top_fixes":["","",""],"praise_line":""}\n'
-                "Score 0-5, comments <=20 words."
+                "Score 0-5, comments <=50 words."
             ),
         },
         {"type": "image_url", "image_url": {"url": data_url}},
