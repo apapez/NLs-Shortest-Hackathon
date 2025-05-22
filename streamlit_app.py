@@ -129,11 +129,9 @@ if uploader:
     json_str = _json.dumps(data, indent=2)
 
     # RE-ENTER the right column so content stays there
+      # Copy-to-clipboard button (fills full column width)
     with right:
-    # … Top fixes already rendered …
-
-    # Copy-to-clipboard button (fills full column width)
-    st.markdown(
+        st.markdown(
         f"""
         <button
             style="display:block;width:100%;
