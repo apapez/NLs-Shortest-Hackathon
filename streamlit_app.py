@@ -145,12 +145,12 @@ if uploader:
         unsafe_allow_html=True,
     )
 
-    # Collapsible viewer + download
-    with st.expander("See JSON details"):
-        st.code(json_str, language="json")
-        st.download_button(
-            "Download audit.json",
-            data=json_str,
-            file_name="audit.json",
-            mime="application/json",
-        )
+        # Collapsible viewer + download
+        with st.expander("See JSON details"):
+            st.code(json_str, language="json")
+            st.download_button(
+                "Download audit.json",
+                data=json_str,
+                file_name="audit.json",
+                mime="application/json",
+            )
