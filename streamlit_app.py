@@ -1,16 +1,10 @@
-import streamlit as st, os, base64, json
-from groq import Groq                   # make sure groq is in requirements.txt
+# ---------- IMPORTS ----------
+import streamlit as st, os, base64, json, time           #  add 'time' for animations
+from groq import Groq
 
+# ---------- PAGE CONFIG ----------
+st.set_page_config(page_title="Find out how good your form is", page_icon="📝", layout="wide")
 
-st.set_page_config(page_title="Form UX Evaluator", page_icon="📝")
-
-st.title("📝 Find out how good your form is (alpha)")
-
-img = st.file_uploader("Drop a screenshot of your form →", type=["png", "jpg", "jpeg"])
-
-# if img:
-#    st.image(img, caption="Your form")
-#    st.success("Great! AI analysis will appear here once we add the API call.")
 # ---------- TOP-LEVEL PLACEHOLDERS ----------
 col1, col2 = st.columns([1, 1])          # 50-50 split; tweak to taste
 
@@ -35,17 +29,16 @@ if uploader is None:
     fix_slot.write("• _none yet_")
     praise_slot.info("Upload a screenshot to get instant feedback.")
 
-# ------------------------------------------
-# 🖼️  Vision path with Llama-4 Scout
-# ------------------------------------------
-if img:
-    # read the uploaded file into bytes
-    image_bytes = img.getvalue()
+# ---------- MAIN FLOW AFTER UPLOAD ----------
+if uploader:
+    # 1. show the image immediately
+    img_slot.image(uploader, caption="Your form")
+
 
     # 1. base64-encode for the API
     import base64, io, json
-    b64_img = base64.b64encode(image_bytes).decode("utf-8")
-    data_url = f"data:image/jpeg;base64,{b64_img}"
+    b64 = base64.b64encode(uploader.getvalue()).decode()
+    data_url = f"data:image/jpeg;base64,{b64}"
 
     # 2. craft the prompt
     user_content = [
@@ -69,26 +62,29 @@ if img:
           )},
         { "type": "image_url", "image_url": { "url": data_url } }
     ]
-
-    # 3. call Groq
-    from groq import Groq
+    
+    ]
     client = Groq(api_key=os.environ["GROQ_API_KEY"])
-    with st.spinner("Asking Llama-4 Scout…"):
+    with st.spinner("Asking Llama-4 Vision…"):
         rsp = client.chat.completions.create(
             model="meta-llama/llama-4-scout-17b-16e-instruct",
-            messages=[{ "role": "user", "content": user_content }],
+            messages=[{"role": "user", "content": user_content}],
             temperature=0.3,
-            response_format={ "type": "json_object" }   # 💡 forces valid JSON
+            response_format={"type": "json_object"}
         )
     data = json.loads(rsp.choices[0].message.content)
 
-    # 4. display
-    st.image(img, caption="Your form")
-    st.header("📊 Heuristic scores")
-    for h in data["heuristics"]:
-        st.write(f"**{h['name']}**: {h['score']}  — {h['comment']}")
-        st.progress(h["score"] / 5)
-    st.header("🛠️ Top fixes")
-    for fix in data["top_fixes"]:
-        st.write("• " + fix)
-    st.success(data["praise_line"])
+    # 3. animate the scores
+    score_header.subheader("📊 Heuristic scores")
+    for i, h in enumerate(data["heuristics"]):
+        target = h["score"]
+        # simple numeric ramp 0→target
+        for val in range(target + 1):
+            score_slots[i].progress(val / 5, text=f"{h['name']} {val}/5 — {h['comment'] if val==target else ''}")
+            time.sleep(0.05)
+
+    # 4. fixes & praise
+    fix_header.subheader("🛠️ Top fixes")
+    fixes_md = "\n".join("• " + f for f in data["top_fixes"])
+    fix_slot.write(fixes_md)
+    praise_slot.success(data["praise_line"])
