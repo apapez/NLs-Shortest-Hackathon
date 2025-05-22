@@ -71,7 +71,7 @@ if uploader:
     messages=[{"role": "user", "content": user_content}],
     temperature=0.3,
     max_completion_tokens=512,          # ← NEW
-    # response_format={"type": "json_object"},   # ← comment out if 500 persists
+    response_format={"type": "json_object"},   # ← comment out if 500 persists
     )
         
     data = json.loads(rsp.choices[0].message.content)
