@@ -123,7 +123,7 @@ if uploader:
     #     data=json_str,
     #     file_name="audit.json",
     #     mime="application/json",
-    )
+    #)
 
     # animate scores
     score_header.subheader("📊 Heuristic scores")
