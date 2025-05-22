@@ -113,10 +113,12 @@ if uploader:
         # ---------- DYNAMIC 5-BULLET SUMMARY ----------
     
     def dynamic_summary(data_json: dict) -> str:
-        """
-        Call a smaller, cheap Groq Llama-3 model to turn the numeric audit
-        into 4-5 varied, emoji-led bullets.  Returns raw markdown.
-        """
+        rsp = c.chat.completions.create(
+            model="meta-llama/llama-4-scout-17b-16e-instruct",
+            messages=[{"role":"user","content":prompt}],
+            temperature=0.9,
+            max_tokens=180,
+        )
         prompt = f"""
     You are a senior UX copywriter.
     Write 4-5 short, actionable bullets about this form audit JSON.
