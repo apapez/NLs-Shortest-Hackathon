@@ -135,17 +135,21 @@ if uploader:
             f"""
             <button
                 style="margin-top:20px;background:#2f9cf4;color:white;
-                       border:none;padding:10px 20px;border-radius:6px;
-                       font-size:14px;cursor:pointer;"
+                       border:none;
+                       padding:10px 20px;
+                       border-radius:6px;
+                       font-size:14px;
+                       cursor:pointer;"
                 onclick='navigator.clipboard.writeText({ _json.dumps(json_str) })'>
                 📋 Copy full&nbsp;JSON
             </button>
             """,
-            height=55,   # ≥ button height
+            height=60,   # ≥ button height
+            width=100%   # full width lets go
         )
 
         # Collapsible viewer + download
-        with st.expander("See details"):
+        with st.expander("See JSON details"):
             st.code(json_str, language="json")
             st.download_button(
                 "Download audit.json",
