@@ -2,32 +2,58 @@
 import streamlit as st, os, base64, json, time           #  add 'time' for animations
 from groq import Groq
 
+# ---------- HEADER ----------
+st.markdown(
+    """
+    <div style='width:100%; background:#111; padding:6px 12px;'>
+        <span style='font-size:15px; color:#bbb;'>
+            📝 Humans design bad forms. Let AI help (alpha)
+        </span>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
 # ---------- PAGE CONFIG ----------
 st.set_page_config(page_title="Humans design bad forms. Let AI help", page_icon="📝", layout="wide")
 
 # ---------- TOP-LEVEL PLACEHOLDERS ----------
-col1, col2 = st.columns([1, 1])          # 50-50 split; tweak to taste
+col1, col2 = st.columns([2, 1], gap="64px")          # 50-50 split; tweak to taste
 
-with col1:
+# ↓ wrappers give each side its own bg colour & padding
+left_bg  = left.container()
+right_bg = right.container()
+
+with left_bg:
+    st.markdown(
+        "<div style='background:#f4f4f4; padding:16px; border-radius:6px;'>",
+        unsafe_allow_html=True,
+    )
     st.subheader("Drop a screenshot of your form →")
     uploader = st.file_uploader("", type=["png", "jpg", "jpeg"])
+    img_slot = st.empty()               # we’ll fill later
+    st.markdown("</div>", unsafe_allow_html=True)
 
-# Reserve empty containers so we can update later
-img_slot       = col1.empty()
-score_header   = col2.empty()
-score_slots    = [col2.empty() for _ in range(5)]
-fix_header     = col2.empty()
-fix_slot       = col2.empty()
-praise_slot    = col2.empty()
+with right_bg:
+    st.markdown(
+        "<div style='background:#fff; padding:16px; border-radius:6px;'>",
+        unsafe_allow_html=True,
+    )
+    summary_slot  = st.empty()
+    score_header  = st.empty()
+    score_slots   = [st.empty() for _ in range(5)]
+    fix_header    = st.empty()
+    fix_slot      = st.empty()
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # ---------- DUMMY RIGHT PANE BEFORE UPLOAD ----------
 if uploader is None:
+    summary_slot.info("Awaiting an image…")
     score_header.subheader("📊 Scores of your form")
     for s in score_slots:
         s.progress(0)
-    fix_header.subheader("🛠️ Top fixes")
-    fix_slot.write("• _none yet_")
-    praise_slot.info("Upload a screenshot to see if your form deserved praise.")
+    fix_header.subheader("🛠️ What you should go fix")
+    fix_slot.write("—")
 
 # ---------- MAIN FLOW AFTER UPLOAD ----------
 if uploader:
