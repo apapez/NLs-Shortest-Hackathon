@@ -109,22 +109,6 @@ if uploader:
         f"Biggest opportunity: **{low['name']}** ({low['score']}/5)."
     )
 
-    # ---------- Copy-JSON button ----------
-    import json as _json
-
-    json_str = _json.dumps(data, indent=2)
-
-    with summary_slot.expander("⬇ Click to copy full JSON", expanded=False):
-        st.code(json_str, language="json")            # copy-icon appears top-right
-  
-    # optional download button (uncomment if you like)
-    # st.download_button(
-    #     "Download as audit.json",
-    #     data=json_str,
-    #     file_name="audit.json",
-    #     mime="application/json",
-    #)
-
     # animate scores
     score_header.subheader("📊 Heuristic scores")
     for i, h in enumerate(data["heuristics"]):
@@ -136,3 +120,37 @@ if uploader:
     # fixes
     fix_header.subheader("🛠️ Top fixes")
     fix_slot.write("\n".join("• "+f for f in data["top_fixes"]))
+
+
+        # ---------- JSON copy & details ----------
+    import json as _json
+    import streamlit.components.v1 as components
+    
+    json_str = _json.dumps(data, indent=2)
+    
+    # 1) Copy-to-clipboard button (uses browser clipboard API)
+    components.html(
+        f"""
+        <button style="
+            background:#2f9cf4;
+            color:white;
+            border:none;
+            padding:10px 16px;
+            border-radius:6px;
+            font-size:14px;
+            cursor:pointer;
+            "
+            onclick='navigator.clipboard.writeText({_json.dumps(json_str)})'>
+            📋 Copy full JSON
+        </button>
+        """,
+        height=45,
+    )
+    
+    # 2) Collapsed expander to view / download
+    with right.expander("See details"):
+        st.code(json_str, language="json")
+        st.download_button("Download audit.json",
+                           data=json_str,
+                           file_name="audit.json",
+                           mime="application/json")
