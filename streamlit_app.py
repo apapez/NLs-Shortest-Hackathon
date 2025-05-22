@@ -37,20 +37,32 @@ st.markdown(
 )
 
 # ---------- LAYOUT: 2/3 – 1/3 ----------
-left, right = st.columns([2, 1], gap="small")   # 2-third / 1-third
+left, right = st.columns([2, 1], gap="small")
 
-with left:
+# LEFT – grey
+with left.container():
+    st.markdown(
+        "<div style='background:#f4f4f4; padding:24px; border-radius:8px;'>",
+        unsafe_allow_html=True,
+    )
     st.subheader("Drop a screenshot of your form →")
     uploader = st.file_uploader("", type=["png", "jpg", "jpeg"])
     img_slot = st.empty()
+    st.markdown("</div>", unsafe_allow_html=True)
 
-with right:
+# RIGHT – white
+with right.container():
+    st.markdown(
+        "<div style='background:#ffffff; padding:24px; border-radius:8px;'>",
+        unsafe_allow_html=True,
+    )
     summary_slot = st.empty()
     score_header = st.empty()
     score_slots  = [st.empty() for _ in range(5)]
     fix_header   = st.empty()
     fix_slot     = st.empty()
     praise_slot  = st.empty()
+    st.markdown("</div>", unsafe_allow_html=True)
   
 
 # ---------- BEFORE UPLOAD ----------
