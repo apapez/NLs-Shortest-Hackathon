@@ -115,7 +115,7 @@ if uploader:
     json_str = _json.dumps(data, indent=2)
 
     with summary_slot.expander("⬇ Click to copy full JSON", expanded=False):
-    st.code(json_str, language="json")            # copy-icon appears top-right
+        st.code(json_str, language="json")            # copy-icon appears top-right
   
     # optional download button (uncomment if you like)
     # st.download_button(
