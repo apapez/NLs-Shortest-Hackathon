@@ -1,10 +1,10 @@
 import streamlit as st
 
-st.set_page_config(page_title="Form Auditor", page_icon="📝")
+st.set_page_config(page_title="Form UX Evaluator", page_icon="📝")
 
-st.title("📝 Form-Friendliness Auditor (beta)")
+st.title("📝 Find out how good your form is (alpha)")
 
-img = st.file_uploader("Drop a form screenshot →", type=["png", "jpg", "jpeg"])
+img = st.file_uploader("Drop a screenshot of your form →", type=["png", "jpg", "jpeg"])
 
 if img:
     st.image(img, caption="Your form")
