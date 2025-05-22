@@ -4,11 +4,6 @@ import streamlit as st
 import streamlit.components.v1 as components
 from groq import Groq
 
-@st.cache_resource
-def get_client() -> Groq:
-    """Return a singleton Groq client for all calls."""
-    return Groq(api_key=os.getenv("GROQ_API_KEY"))
-
 # ---------- PAGE CONFIG ----------
 st.set_page_config(
     page_title="Humans design bad forms. Let AI help",
@@ -110,45 +105,13 @@ if uploader:
 
     data = json.loads(rsp.choices[0].message.content)
 
-        # ---------- DYNAMIC 5-BULLET SUMMARY ----------
-    
-    def dynamic_summary(data_json: dict) -> str:
-        rsp = c.chat.completions.create(
-            model="meta-llama/llama-4-scout-17b-16e-instruct",
-            messages=[{"role":"user","content":prompt}],
-            temperature=0.9,
-            max_tokens=180,
-        )
-        prompt = f"""
-    You are a senior UX copywriter.
-    Write 4-5 short, actionable bullets about this form audit JSON.
-    • Mix praise and constructive advice. 
-    • Vary word choice every time; avoid templates.
-    • Each bullet ≤ 18 words, start with a fitting emoji.
-    JSON:
-    {json.dumps(data_json, indent=2)}
-    """
-        c = get_client()                     # cached Groq client we set earlier
-        rsp = c.chat.completions.create(
-            model="llama3-8b-8192",          # fast & inexpensive
-            messages=[{"role":"user","content":prompt}],
-            temperature=0.9,                 # more creativity
-            max_tokens=180,
-        )
-        return rsp.choices[0].message.content.strip()
-    
-    # produce the bullets
-    bullets_md = dynamic_summary(data)
-    
-    # pretty card
+    # 3 ▸ summary at top
+    hi = max(data["heuristics"], key=lambda h: h["score"])
+    lo = min(data["heuristics"], key=lambda h: h["score"])
     summary_slot.markdown(
-        f"""
-        <div style="background:#23395d22;padding:18px 22px;
-                    border-left:6px solid #2f9cf4;border-radius:6px;margin-bottom:14px;">
-            {bullets_md}
-        </div>
-        """,
-        unsafe_allow_html=True,
+        f"**{data['praise_line']}**  \n"
+        f"Highest: **{hi['name']}** ({hi['score']}/5) &nbsp;|&nbsp; "
+        f"Biggest opportunity: **{lo['name']}** ({lo['score']}/5)"
     )
 
     # 4 ▸ animated bars
