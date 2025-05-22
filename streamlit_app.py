@@ -110,19 +110,20 @@ if uploader:
     )
 
     # ---------- Copy-JSON button ----------
-import json as _json
+    import json as _json
 
-json_str = _json.dumps(data, indent=2)
+    json_str = _json.dumps(data, indent=2)
 
-with summary_slot.expander("⬇ Click to copy full JSON", expanded=False):
+    with summary_slot.expander("⬇ Click to copy full JSON", expanded=False):
     st.code(json_str, language="json")            # copy-icon appears top-right
+  
     # optional download button (uncomment if you like)
     # st.download_button(
     #     "Download as audit.json",
     #     data=json_str,
     #     file_name="audit.json",
     #     mime="application/json",
-    # )
+    )
 
     # animate scores
     score_header.subheader("📊 Heuristic scores")
