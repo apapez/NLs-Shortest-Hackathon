@@ -2,13 +2,6 @@
 import streamlit as st, os, base64, json, time           #  add 'time' for animations
 from groq import Groq
 
-rsp = client.chat.completions.create(
-    model="meta-llama/llama-4-scout-17b-16e-instruct",
-    messages=[{"role": "user", "content": user_content}],
-    temperature=0.3,
-    max_completion_tokens=512,          # ← NEW
-    # response_format={"type": "json_object"},   # ← comment out if 500 persists
-)
 
 # ---------- PAGE CONFIG ----------
 st.set_page_config(page_title="Humans design bad forms. Let AI help", page_icon="📝", layout="wide")
@@ -74,12 +67,14 @@ if uploader:
     
     client = Groq(api_key=os.environ["GROQ_API_KEY"])
     with st.spinner("Asking Llama-4 Vision…"):
-        rsp = client.chat.completions.create(
-            model="meta-llama/llama-4-scout-17b-16e-instruct",
-            messages=[{"role": "user", "content": user_content}],
-            temperature=0.3,
-            response_format={"type": "json_object"}
-        )
+            rsp = client.chat.completions.create(
+    model="meta-llama/llama-4-scout-17b-16e-instruct",
+    messages=[{"role": "user", "content": user_content}],
+    temperature=0.3,
+    max_completion_tokens=512,          # ← NEW
+    # response_format={"type": "json_object"},   # ← comment out if 500 persists
+    )
+        
     data = json.loads(rsp.choices[0].message.content)
 
     # 3. animate the scores
